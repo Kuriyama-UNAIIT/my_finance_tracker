@@ -1,6 +1,6 @@
 <template>
-  <div class="grid grid-cols-2 py-4 border-b border-muted">
-    <div class="flex items-center justify-between">
+  <div class="grid grid-cols-3 py-4 border-b border-muted">
+    <div class="flex items-center justify-between space-x-4 col-span-2">
       <div class="flex items-center space-x-1">
         <UIcon :name="icon" :class="iconColor" />
         <div>{{ transaction.description }}</div>
@@ -23,6 +23,7 @@
             color="neutral"
             variant="link"
             trailing-icon="i-heroicons-ellipsis-horizontal" :loading="isLoading"/>
+          <TransactionModal v-model:open="isOpen" :transaction="transaction" @saved="emit('edited')" />
         </UDropdownMenu>
       </div>
     </div>
@@ -34,7 +35,7 @@ const props = defineProps({
   transaction: Object
 })
 
-const emit = defineEmits(['deleted'])
+const emit = defineEmits(['edited', 'deleted'])
 const isIncome = computed(
   () => props.transaction.type === 'Income'
 )
@@ -52,8 +53,10 @@ const iconColor = computed(
 const { currency } = useCurrency(props.transaction.amount)
 
 const isLoading = ref(false)
-const toast = useToast()
+const toast = useAppToast()
 const supabase = useSupabaseClient()
+
+const isOpen = ref(false)
 
 const deleteTransaction = async () => {
   isLoading.value = true
@@ -61,17 +64,13 @@ const deleteTransaction = async () => {
     await supabase.from('transactions')
       .delete()
       .eq('id', props.transaction.id)
-    toast.add({
-      title: 'Succeeded to delete transaction',
-      icon: 'i-heroicons-check-circle',
-      color: 'success'
+    toast.success({
+      title: 'Succeeded to delete transaction'
     })
     emit('deleted', props.transaction.id)
   } catch (error) {
-    toast.add({
+    toast.error({
       title: 'Failed to delete transaction',
-      icon: 'i-heroicons-exclamation-circle',
-      color: 'error'
     })
   } finally {
     isLoading.value = false
@@ -82,7 +81,7 @@ const items = [
   {
     label: 'Edit',
     icon: 'i-heroicons-pencil-square-20-solid',
-    onSelect: () => console.log('Edit')
+    onSelect: () => isOpen.value = true
   },
   {
     label: 'Delete',

@@ -3,7 +3,7 @@
     <UButton
       :icon="currentIcon"
       color="neutral"
-      variant="link"
+      variant="ghost"
       size="xl"
       @click="toggleMode"/>
   </ClientOnly>

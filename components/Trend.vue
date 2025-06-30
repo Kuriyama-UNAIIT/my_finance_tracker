@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="font-bold" :class="color">{{ title }}</div>
+    <div class="font-bold" :class="props.color">{{ title }}</div>
     <div class="text-2xl font-extrabold mb-2">
       <USkeleton class="h-8 w-full" v-if="loading" />
       <div v-else>{{ currency }}</div>
@@ -21,10 +21,12 @@
 <script setup>
 const props = defineProps({
   title: String,
+  color: String,
   amount: Number,
   lastAmount: Number,
   loading: Boolean
 })
+const { amount } = toRefs(props)
 const trendingUp = computed(
   () => props.amount >= props.lastAmount
 )
@@ -34,10 +36,10 @@ const color = computed(
 const icon = computed(
   () => trendingUp.value ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'
 )
-const { currency } = useCurrency(props.amount)
+const { currency } = useCurrency(amount)
 
 const persentageTrend = computed(() => {
-  if (props.amount === 0 && props.lastAmount === 0) return '-%'
+  if (props.amount === 0 || props.lastAmount === 0) return '-%'
 
   const bigger = Math.max(props.amount, props.lastAmount)
   const smaller = Math.min(props.amount, props.lastAmount)
