@@ -9,5 +9,10 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   supabase: {
     redirect: true
+  },
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL ?? 'http://localhost:3000'
+    }
   }
 })
